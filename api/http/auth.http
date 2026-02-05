@@ -1,0 +1,68 @@
+### =============================================================================
+### Yapuka API - Tests HTTP pour l'authentification
+### =============================================================================
+### Fichier de requêtes HTTP pour PHPStorm / IntelliJ.
+### Permet de tester les endpoints directement depuis l'IDE.
+###
+### Utilisation :
+###   1. Cliquer sur le bouton ▶ à gauche de chaque requête
+###   2. Les variables {{...}} sont définies dans http-client.env.json
+### =============================================================================
+
+### --- Variables d'environnement ---
+### Créer un fichier http-client.env.json avec :
+### {
+###   "dev": {
+###     "host": "http://localhost:8080",
+###     "token": ""
+###   }
+### }
+
+### =============================================================================
+### Inscription d'un nouvel utilisateur
+### =============================================================================
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "demo@yapuka.dev",
+  "username": "Démo User",
+  "password": "password"
+}
+
+### =============================================================================
+### Connexion (obtenir un JWT)
+### =============================================================================
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "demo@yapuka.dev",
+  "password": "password"
+}
+
+> {%
+    // Sauvegarder automatiquement le token JWT pour les requêtes suivantes
+    client.global.set("token", response.body.token);
+    client.test("Le login retourne un token", function() {
+        client.assert(response.status === 200, "Statut 200 attendu");
+        client.assert(response.body.token !== undefined, "Token JWT présent");
+    });
+%}
+
+### =============================================================================
+### Connexion avec mauvais identifiants (doit retourner 401)
+### =============================================================================
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "demo@yapuka.dev",
+  "password": "mauvais_mot_de_passe"
+}
+
+> {%
+    client.test("Le login échoue avec un mauvais mot de passe", function() {
+        client.assert(response.status === 401, "Statut 401 attendu");
+    });
+%}

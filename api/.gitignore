@@ -1,0 +1,28 @@
+# =============================================================================
+# Yapuka API - .gitignore
+# =============================================================================
+
+# Dépendances PHP
+/vendor/
+
+# Variables d'environnement locales
+.env.local
+.env.local.php
+.env.*.local
+
+# Cache et logs Symfony
+/var/
+
+# Clés JWT (ne jamais commiter les clés privées !)
+/config/jwt/*.pem
+
+# PHPUnit
+.phpunit.result.cache
+phpunit.xml
+
+# Composer
+composer.lock
+
+# IDE
+.idea/
+.vscode/

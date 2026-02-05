@@ -1,0 +1,118 @@
+# =============================================================================
+# Docker Compose - Orchestration de tous les services Yapuka
+# =============================================================================
+# Services :
+#   - nginx     : Reverse proxy (port 8080)
+#   - php       : Backend Symfony avec PHP-FPM
+#   - front     : Frontend React avec Vite (port 5173)
+#   - database  : PostgreSQL (port 5432)
+#   - redis     : Cache Redis (port 6379)
+#
+# Démarrage : docker compose up -d
+# Arrêt :     docker compose down
+# Logs :      docker compose logs -f [service]
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # Nginx - Reverse proxy et point d'entrée unique
+  # ===========================================================================
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"    # Accessible sur http://localhost:8080
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./api/public:/var/www/api/public:ro
+    depends_on:
+      - php
+      - front
+    networks:
+      - yapuka
+
+  # ===========================================================================
+  # PHP-FPM - Backend Symfony
+  # ===========================================================================
+  php:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    volumes:
+      - ./api:/var/www/api
+    environment:
+      # Variables Symfony (surchargent le .env)
+      APP_ENV: dev
+      DATABASE_URL: "postgresql://yapuka:yapuka@database:5432/yapuka?serverVersion=16"
+      REDIS_URL: "redis://redis:6379"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - yapuka
+
+  # ===========================================================================
+  # Frontend React (Vite dev server)
+  # ===========================================================================
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    volumes:
+      - ./front:/app
+      - /app/node_modules    # Exclure node_modules du volume
+    environment:
+      VITE_API_URL: "http://localhost:8080"
+    ports:
+      - "5173:5173"    # Accès direct au dev server Vite (optionnel)
+    networks:
+      - yapuka
+
+  # ===========================================================================
+  # PostgreSQL - Base de données
+  # ===========================================================================
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: yapuka
+      POSTGRES_USER: yapuka
+      POSTGRES_PASSWORD: yapuka
+    ports:
+      - "5432:5432"    # Accès direct pour les outils DB (DBeaver, pgAdmin)
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    # Healthcheck : Docker attend que PostgreSQL soit prêt avant de démarrer PHP
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yapuka"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - yapuka
+
+  # ===========================================================================
+  # Redis - Cache et pub/sub pour les notifications
+  # ===========================================================================
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - yapuka
+
+# =============================================================================
+# Volumes persistants (survivent aux docker compose down)
+# =============================================================================
+volumes:
+  db_data:       # Données PostgreSQL
+  redis_data:    # Données Redis
+
+# =============================================================================
+# Réseau interne (les services communiquent par leur nom)
+# =============================================================================
+networks:
+  yapuka:
+    driver: bridge

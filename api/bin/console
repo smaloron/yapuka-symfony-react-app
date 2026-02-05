@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+// =============================================================================
+// Console Symfony - Interface en ligne de commande
+// =============================================================================
+// Exemples de commandes utiles :
+//   php bin/console doctrine:migrations:migrate   → Appliquer les migrations
+//   php bin/console doctrine:fixtures:load         → Charger les fixtures
+//   php bin/console lexik:jwt:generate-keypair     → Générer les clés JWT
+//   php bin/console cache:clear                    → Vider le cache
+// =============================================================================
+
+use App\Kernel;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+
+if (!is_file(dirname(__DIR__).'/vendor/autoload_runtime.php')) {
+    throw new LogicException('Symfony Runtime introuvable. Lancez "composer require symfony/runtime".');
+}
+
+require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+
+return function (array $context) {
+    $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+    return new Application($kernel);
+};

@@ -1,0 +1,32 @@
+/* =============================================================================
+ * Styles globaux - Yapuka Frontend
+ * =============================================================================
+ * Les directives @tailwind importent les styles de base de Tailwind CSS :
+ *   - base : reset CSS et styles de base (typographie, etc.)
+ *   - components : classes de composants réutilisables
+ *   - utilities : toutes les classes utilitaires (bg-blue-500, p-4, etc.)
+ * ============================================================================= */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Styles personnalisés au-delà de Tailwind --- */
+
+/* Animation de chargement pour les Skeleton Screens */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Classe utilitaire pour l'effet de chargement "skeleton" */
+.skeleton {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.375rem;
+}

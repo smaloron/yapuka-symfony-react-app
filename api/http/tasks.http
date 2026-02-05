@@ -1,0 +1,113 @@
+### =============================================================================
+### Yapuka API - Tests HTTP pour les tâches
+### =============================================================================
+### Prérequis : exécuter d'abord le login dans auth.http pour obtenir un token.
+### Le token est automatiquement sauvegardé dans la variable {{token}}.
+### =============================================================================
+
+### =============================================================================
+### Liste des tâches de l'utilisateur connecté
+### =============================================================================
+GET {{host}}/api/tasks
+Authorization: Bearer {{token}}
+Accept: application/json
+
+> {%
+    client.test("La liste des tâches est un tableau", function() {
+        client.assert(response.status === 200, "Statut 200 attendu");
+        client.assert(Array.isArray(response.body), "Le body est un tableau");
+    });
+%}
+
+### =============================================================================
+### Créer une nouvelle tâche
+### =============================================================================
+POST {{host}}/api/tasks
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Configurer le pipeline CI/CD",
+  "description": "Mettre en place GitHub Actions pour le build et le déploiement",
+  "priority": "high",
+  "dueDate": "2026-03-01"
+}
+
+> {%
+    // Sauvegarder l'ID de la tâche créée pour les tests suivants
+    client.global.set("taskId", response.body.id);
+    client.test("La tâche est créée avec le statut todo", function() {
+        client.assert(response.status === 201, "Statut 201 attendu");
+        client.assert(response.body.status === "todo", "Statut 'todo' par défaut");
+    });
+%}
+
+### =============================================================================
+### Modifier une tâche (passer en "done")
+### =============================================================================
+PUT {{host}}/api/tasks/{{taskId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "done"
+}
+
+> {%
+    client.test("La tâche est marquée comme terminée", function() {
+        client.assert(response.status === 200, "Statut 200 attendu");
+        client.assert(response.body.status === "done", "Statut 'done'");
+    });
+%}
+
+### =============================================================================
+### Modifier le titre et la priorité d'une tâche
+### =============================================================================
+PUT {{host}}/api/tasks/{{taskId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Pipeline CI/CD configuré ✅",
+  "priority": "low"
+}
+
+### =============================================================================
+### Supprimer une tâche
+### =============================================================================
+DELETE {{host}}/api/tasks/{{taskId}}
+Authorization: Bearer {{token}}
+
+> {%
+    client.test("La tâche est supprimée", function() {
+        client.assert(response.status === 200, "Statut 200 attendu");
+    });
+%}
+
+### =============================================================================
+### Statistiques des tâches
+### =============================================================================
+GET {{host}}/api/tasks/stats
+Authorization: Bearer {{token}}
+Accept: application/json
+
+> {%
+    client.test("Les stats contiennent les clés attendues", function() {
+        client.assert(response.status === 200, "Statut 200 attendu");
+        client.assert(response.body.total !== undefined, "Clé 'total' présente");
+        client.assert(response.body.todo !== undefined, "Clé 'todo' présente");
+        client.assert(response.body.done !== undefined, "Clé 'done' présente");
+    });
+%}
+
+### =============================================================================
+### Accès sans authentification (doit retourner 401)
+### =============================================================================
+GET {{host}}/api/tasks
+Accept: application/json
+
+> {%
+    client.test("Accès refusé sans token", function() {
+        client.assert(response.status === 401, "Statut 401 attendu");
+    });
+%}

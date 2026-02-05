@@ -1,0 +1,46 @@
+# =============================================================================
+# Configuration de la sécurité Symfony
+# =============================================================================
+# Définit comment les utilisateurs sont authentifiés (JWT via Lexik).
+# Le firewall "api" protège toutes les routes /api/* sauf login/register.
+# =============================================================================
+
+security:
+    # Algorithme de hachage des mots de passe
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # Fournisseur d'utilisateurs : charge les users depuis la base de données
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    # Firewalls : définissent les stratégies d'authentification
+    firewalls:
+        # Le firewall "dev" laisse passer les outils de développement
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        # Routes publiques : inscription et connexion (pas besoin de JWT)
+        auth:
+            pattern: ^/api/auth
+            stateless: true
+            security: false
+
+        # Firewall principal : toutes les routes /api/* sont protégées par JWT
+        api:
+            pattern: ^/api
+            stateless: true
+            jwt: ~
+
+    # Contrôle d'accès : qui peut accéder à quoi
+    access_control:
+        # Les routes d'authentification sont ouvertes à tous
+        - { path: ^/api/auth, roles: PUBLIC_ACCESS }
+        # La documentation API est publique
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+        # Toutes les autres routes /api nécessitent un utilisateur authentifié
+        - { path: ^/api, roles: ROLE_USER }

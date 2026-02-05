@@ -1,0 +1,17 @@
+# =============================================================================
+# Configuration Lexik JWT Authentication
+# =============================================================================
+# Gère la création et la validation des tokens JWT.
+# Les clés RSA sont générées avec :
+#   php bin/console lexik:jwt:generate-keypair
+# =============================================================================
+
+lexik_jwt_authentication:
+    # Clé privée pour SIGNER les tokens (ne jamais exposer !)
+    secret_key: '%env(resolve:JWT_SECRET_KEY)%'
+    # Clé publique pour VÉRIFIER les tokens
+    public_key: '%env(resolve:JWT_PUBLIC_KEY)%'
+    # Phrase de passe pour déchiffrer la clé privée
+    pass_phrase: '%env(JWT_PASSPHRASE)%'
+    # Durée de validité du token : 1 heure
+    token_ttl: 3600

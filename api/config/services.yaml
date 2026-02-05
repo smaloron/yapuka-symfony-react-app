@@ -1,0 +1,20 @@
+# =============================================================================
+# Configuration des services Symfony (Injection de dépendances)
+# =============================================================================
+# Symfony utilise l'autowiring pour injecter automatiquement les dépendances.
+# Tous les fichiers dans src/ sont automatiquement enregistrés comme services.
+# =============================================================================
+
+services:
+    # Configuration par défaut pour tous les services
+    _defaults:
+        autowire: true      # Injection automatique des dépendances
+        autoconfigure: true  # Configuration automatique (commandes, listeners, etc.)
+
+    # Enregistre automatiquement toutes les classes dans src/ comme services
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
