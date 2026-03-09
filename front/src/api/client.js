@@ -42,20 +42,17 @@ async function apiRequest(endpoint, options = {}) {
     headers,
   });
 
-    console.log(`[API] ${endpoint} → ${response.status}`);
-
-    if (response.status === 401) {
-        console.warn('[API] 401 reçu sur', endpoint);
-    }
 
   // Gérer le cas du token expiré (401 Unauthorized)
   if (response.status === 401) {
+
     // Nettoyer le token invalide
     localStorage.removeItem('yapuka_token');
     localStorage.removeItem('yapuka_user');
     // Rediriger vers la page de connexion
     window.location.href = '/login';
     throw new Error('Session expirée. Veuillez vous reconnecter.');
+
   }
 
   // Gérer les autres erreurs HTTP

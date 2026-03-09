@@ -15,3 +15,7 @@ lexik_jwt_authentication:
     pass_phrase: '%env(JWT_PASSPHRASE)%'
     # Durée de validité du token : 1 heure
     token_ttl: 3600
+    # Utiliser "email" comme claim d'identité dans le token JWT
+    # (évite le conflit avec la méthode getUsername() de l'entité User
+    # qui retourne le nom d'affichage au lieu de l'email)
+    user_id_claim: email
