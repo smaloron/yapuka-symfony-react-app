@@ -1,0 +1,33 @@
+# api/.dockerignore
+
+# Dépendances (installées dans le build)
+/vendor/
+
+# Cache et logs Symfony
+/var/
+
+# Clés JWT (montées en secret, pas dans l'image)
+/config/jwt/
+
+# Tests (pas en production)
+/tests/
+/features/
+/phpunit.xml.dist
+/behat.yml
+
+# Fixtures et fichiers de dev
+/.env.local
+/.env.test
+
+# Fichiers HTTP de test PHPStorm
+/http/
+
+# Git et IDE
+.git/
+.gitignore
+.idea/
+.vscode/
+
+# Docker (éviter la récursion)
+Dockerfile*
+docker-compose*

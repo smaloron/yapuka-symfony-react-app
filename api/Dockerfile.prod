@@ -1,0 +1,57 @@
+# =============================================================================
+# Dockerfile de production — Yapuka API
+# =============================================================================
+# Multi-stage build :
+#   1. base       → Extensions PHP, dépendances système
+#   2. deps       → Composer install (cache optimisé)
+#   3. production → Image finale légère, user non-root
+# =============================================================================
+
+# --- Stage 1 : Base ---
+FROM php:8.4-fpm-alpine AS base
+
+RUN apk add --no-cache icu-libs libpq \
+    && apk add --no-cache --virtual .build-deps \
+       $PHPIZE_DEPS icu-dev libpq-dev linux-headers \
+    && docker-php-ext-install -j$(nproc) pdo_pgsql intl opcache \
+    && pecl install redis && docker-php-ext-enable redis \
+    && apk del .build-deps \
+    && rm -rf /var/cache/apk/* /tmp/*
+
+# --- Stage 2 : Dépendances Composer ---
+FROM base AS deps
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+WORKDIR /var/www/api
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev --no-scripts --no-interaction \
+    --optimize-autoloader --no-progress
+
+# --- Stage 3 : Production ---
+FROM base AS production
+
+RUN echo '\
+opcache.enable=1\n\
+opcache.memory_consumption=128\n\
+opcache.interned_strings_buffer=16\n\
+opcache.max_accelerated_files=10000\n\
+opcache.validate_timestamps=0\n\
+opcache.save_comments=1\n\
+opcache.fast_shutdown=1\n\
+' > /usr/local/etc/php/conf.d/opcache-prod.ini
+
+WORKDIR /var/www/api
+
+COPY --from=deps /var/www/api/vendor ./vendor
+COPY . .
+
+RUN mkdir -p var/cache var/log \
+    && chown -R www-data:www-data var/
+
+ENV APP_ENV=prod
+ENV APP_DEBUG=0
+
+USER www-data
+EXPOSE 9000
+CMD ["php-fpm"]
