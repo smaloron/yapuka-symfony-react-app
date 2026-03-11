@@ -1,0 +1,10 @@
+name: test
+on: workflow_dispatch
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Récupération du code source
+      - name: test echo
+        run: echo "test"
