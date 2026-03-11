@@ -38,23 +38,23 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: ./api
-          file: Dockerfile.prod
+          file: ./api/Dockerfile.prod
           push: true
           tags: |
             ghcr.io/${{ github.repository }}/backend:latest
             ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       # --- Build et push de l'image frontend ---
       - name: Build & Push Frontend
         uses: docker/build-push-action@v7
         with:
           context: ./front
-          file: Dockerfile.prod
+          file: ./front/Dockerfile.prod
           push: true
           tags: |
             ghcr.io/${{ github.repository }}/frontend:latest
             ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
-          #cache-from: type=gha
-          #cache-to: type=gha,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
