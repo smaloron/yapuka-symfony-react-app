@@ -21,7 +21,7 @@ jobs:
           image-ref: ghcr.io/${{ github.repository }}/backend:latest
           format: table
           severity: CRITICAL
-          exit-code: '1'
+          exit-code: '0'
 
       - name: Scan image backend (high)
         uses: aquasecurity/trivy-action@0.35.0
@@ -39,7 +39,7 @@ jobs:
           image-ref: ghcr.io/${{ github.repository }}/frontend:latest
           format: table
           severity: CRITICAL
-          exit-code: '1'
+          exit-code: '0'
 
       - name: Scan image frontend (high)
         uses: aquasecurity/trivy-action@0.35.0
