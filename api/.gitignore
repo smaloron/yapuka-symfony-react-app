@@ -13,15 +13,10 @@
 # Cache et logs Symfony
 /var/
 
-# Clés JWT (ne jamais commiter les clés privées !)
-/config/jwt/*.pem
 
 # PHPUnit
 .phpunit.result.cache
-phpunit.xml
 
-# Composer
-composer.lock
 
 # IDE
 .idea/
@@ -33,8 +28,7 @@ composer.lock
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
-/var/
-/vendor/
+
 ###< symfony/framework-bundle ###
 
 ###> lexik/jwt-authentication-bundle ###
