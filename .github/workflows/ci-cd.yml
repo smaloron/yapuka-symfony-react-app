@@ -1,0 +1,29 @@
+name: CI/CD
+on: workflow_dispatch
+jobs:
+  lint-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      # Récupération du code source
+      - name: Checkout du code
+        uses: actions/checkout@v6
+      # Installation de PHP
+      - name: Installation de PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: 'intl, pdo_pgsql, redis'
+          tools: 'composer:v2'
+      # Cache des dépendances Composer
+      - name: Cache Composer
+        uses: actions/cache@v5
+        with:
+          path: 'vendor'
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-
+      # Installation des dépendances
+      - name: Installation des dépendances
+        run: composer install --no-progress --no-suggest --no-interaction --prefer-dist
