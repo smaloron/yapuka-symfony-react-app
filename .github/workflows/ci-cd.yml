@@ -66,3 +66,90 @@ jobs:
       # --- Vérifier la qualité du code ---
       - name: ESLint
         run: npm run lint
+
+  # ===========================================================================
+  # Job : Tests unitaires PHP avec PHPUnit
+  # ===========================================================================
+  test-backend:
+    name: Tests Backend (PHPUnit)
+    runs-on: ubuntu-latest
+    # --- Ce job attend la fin des deux lints ---
+    needs: [ lint-backend, lint-frontend ]
+    defaults:
+      run:
+        working-directory: api
+
+    # --- Services nécessaires (conteneurs Docker) ---
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: yapuka_test
+          POSTGRES_USER: yapuka
+          POSTGRES_PASSWORD: yapuka
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U yapuka"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    # --- Variables d'environnement pour Symfony ---
+    env:
+      DATABASE_URL: "postgresql://yapuka:yapuka@localhost:5432/yapuka_test?serverVersion=16&charset=utf8"
+      REDIS_URL: "redis://localhost:6379"
+      APP_ENV: test
+      APP_SECRET: ci-test-secret
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: intl, pdo_pgsql, redis
+          coverage: xdebug
+          tools: composer
+
+      - name: Cache Composer
+        uses: actions/cache@v5
+        with:
+          path: api/vendor
+          key: composer-${{ hashFiles('api/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Installation des dépendances
+        run: composer install --no-interaction --prefer-dist
+
+      # --- Générer les clés JWT pour l'authentification ---
+      - name: Génération des clés JWT
+        run: php bin/console lexik:jwt:generate-keypair --skip-if-exists
+
+      # --- Créer le schéma de la base de données de test ---
+      - name: Création du schéma de base de données
+        run: php bin/console doctrine:schema:create --env=test
+
+      # --- Exécuter les tests avec rapport de couverture ---
+      - name: Exécution de PHPUnit
+        run: php bin/phpunit --coverage-clover coverage.xml
+
+      # --- Sauvegarder le rapport de couverture ---
+      - name: Upload du rapport de couverture
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: backend-coverage
+          path: api/coverage.xml
