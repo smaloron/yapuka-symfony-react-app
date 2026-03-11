@@ -25,6 +25,7 @@ use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 class UserFactory extends PersistentProxyObjectFactory
 {
     // Compteur pour générer des emails uniques
+    /** @var int */
     private static int $counter = 0;
 
     public function __construct(
@@ -44,7 +45,7 @@ class UserFactory extends PersistentProxyObjectFactory
      */
     protected function defaults(): array|callable
     {
-        ++self::$counter;
+        self::$counter++;
 
         return [
             'email' => 'user'.self::$counter.'@yapuka.dev',
