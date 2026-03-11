@@ -1,0 +1,78 @@
+name: security-scan
+on: workflow_dispatch
+
+jobs:
+  # ===========================================================================
+  # Job : Scan de sécurité des images Docker
+  # ===========================================================================
+  security-scan:
+    name: Security Scan (Trivy)
+    runs-on: ubuntu-latest
+
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v6
+
+      # --- Scanner l'image backend (bloque si vulnérabilité CRITICAL) ---
+      - name: Scan image backend (critical)
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}/backend:latest
+          format: table
+          severity: CRITICAL
+          exit-code: '1'
+
+      - name: Scan image backend (high)
+        uses: aquasecurity/trivy-action@0.35.0
+        if: always()
+        with:
+          image-ref: ghcr.io/${{ github.repository }}/backend:latest
+          format: table
+          severity: HIGH
+          exit-code: '0'
+
+      # --- Scanner l'image frontend ---
+      - name: Scan image frontend (critical)
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}/frontend:latest
+          format: table
+          severity: CRITICAL
+          exit-code: '1'
+
+      - name: Scan image frontend (high)
+        uses: aquasecurity/trivy-action@0.35.0
+        if: always()
+        with:
+          image-ref: ghcr.io/${{ github.repository }}/frontend:latest
+          format: table
+          severity: HIGH
+          exit-code: '0'
+
+      # --- Générer un rapport détaillé (ne bloque pas) ---
+      - name: Rapport SARIF backend
+        uses: aquasecurity/trivy-action@0.35.0
+        if: always()
+        with:
+          image-ref: ghcr.io/${{ github.repository }}/backend:latest
+          format: sarif
+          output: backend-trivy.sarif
+          severity: CRITICAL,HIGH
+
+      - name: Rapport SARIF frontend
+        uses: aquasecurity/trivy-action@0.35.0
+        if: always()
+        with:
+          image-ref: ghcr.io/${{ github.repository }}/frontend:latest
+          format: sarif
+          output: frontend-trivy.sarif
+          severity: CRITICAL,HIGH
+
+      # --- Sauvegarder le rapport ---
+      - name: Upload rapport de sécurité
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: trivy-reports
+          path: "*.sarif"
