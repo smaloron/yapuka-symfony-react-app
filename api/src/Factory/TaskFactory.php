@@ -50,7 +50,7 @@ class TaskFactory extends PersistentProxyObjectFactory
      */
     protected function defaults(): array|callable
     {
-        ++self::$counter;
+        self::$counter++;
         $titleIndex = self::$counter % count(self::SAMPLE_TITLES);
 
         return [

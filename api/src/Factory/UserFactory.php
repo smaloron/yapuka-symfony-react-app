@@ -45,7 +45,7 @@ class UserFactory extends PersistentProxyObjectFactory
      */
     protected function defaults(): array|callable
     {
-        ++self::$counter;
+        self::$counter++;
 
         return [
             'email' => 'user'.self::$counter.'@yapuka.dev',
