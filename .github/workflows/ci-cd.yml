@@ -31,3 +31,38 @@ jobs:
         run: vendor/bin/php-cs-fixer fix --dry-run --diff
       - name: Linting du code avec PHPStan
         run: vendor/bin/phpstan analyse
+
+    # ===========================================================================
+    # Job : Vérification de la qualité du code JavaScript
+    # ===========================================================================
+  lint-frontend:
+    name: Lint Frontend (JS)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v6
+
+      # --- Installer Node.js ---
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      # --- Mettre en cache les dépendances npm ---
+      - name: Cache npm
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('front/package-lock.json') }}
+          restore-keys: npm-
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      # --- Vérifier la qualité du code ---
+      - name: ESLint
+        run: npm run lint
