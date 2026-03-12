@@ -8,7 +8,7 @@ jobs:
   # ===========================================================================
   build-images:
     name: Build Images Docker
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
 
     permissions:
       contents: read
@@ -53,6 +53,7 @@ jobs:
           context: ./front
           file: ./front/Dockerfile.prod
           push: true
+          platforms: linux/arm64
           tags: |
             ghcr.io/${{ github.repository }}/frontend:latest
             ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
