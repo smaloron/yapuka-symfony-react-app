@@ -1,0 +1,9 @@
+Name                    State             IPv4             Image
+manager                 Running           192.168.2.7      Ubuntu 24.04 LTS
+                                          172.17.0.1
+worker-1                Running           192.168.2.8      Ubuntu 24.04 LTS
+                                          172.17.0.1
+worker-2                Running           192.168.2.9      Ubuntu 24.04 LTS
+                                          172.17.0.1
+
+docker swarm join --token SWMTKN-1-03hxtyq9ziltvecmjzyx0fqnkj5mh0dxdsgtvcydrd9di828yw-d00at76ut09imzj0jmxzs5y7w 192.168.2.7:2377

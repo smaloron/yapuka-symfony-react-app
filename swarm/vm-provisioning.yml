@@ -1,0 +1,15 @@
+# Provision for the swarm VM to install Docker
+
+# Mise à jour des paquets au premier lancement
+package_update: true
+package_upgrade: true
+
+# Installation des dépendances pour Docker
+packages:
+  - ca-certificates
+  - curl
+
+# Script d'installation de Docker + ajout de l'utilisateur ubuntu au groupe docker
+runcmd:
+  - curl -fsSL https://get.docker.com | sh
+  - usermod -aG docker ubuntu
