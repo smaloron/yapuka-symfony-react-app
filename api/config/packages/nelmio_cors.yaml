@@ -1,0 +1,29 @@
+# =============================================================================
+# Configuration Nelmio CORS
+# =============================================================================
+# Gère les en-têtes CORS (Cross-Origin Resource Sharing).
+# Indispensable pour que le frontend React puisse appeler l'API
+# depuis un domaine/port différent.
+# =============================================================================
+
+nelmio_cors:
+    defaults:
+        # Origines autorisées (défini dans .env)
+        origin_regex: true
+        allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+        # Méthodes HTTP autorisées
+        allow_methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+        # En-têtes autorisés (Authorization pour le JWT)
+        allow_headers: ['Content-Type', 'Authorization', 'Accept']
+        # Exposer ces en-têtes au frontend
+        expose_headers: ['Link']
+        # Durée de mise en cache des requêtes preflight (en secondes)
+        max_age: 3600
+
+    paths:
+        # Appliquer CORS à toutes les routes /api
+        '^/api/':
+            allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+            allow_headers: ['Content-Type', 'Authorization', 'Accept']
+            allow_methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+            max_age: 3600

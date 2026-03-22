@@ -1,0 +1,19 @@
+# =============================================================================
+# Configuration des routes principales
+# =============================================================================
+# Charge automatiquement les routes depuis les attributs PHP des contrôleurs
+# et les routes générées par API Platform.
+# =============================================================================
+
+# Routes définies par les attributs #[Route] dans les contrôleurs
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+
+# Routes générées automatiquement par API Platform
+api_platform:
+    resource: .
+    type: api_platform
+    prefix: /api

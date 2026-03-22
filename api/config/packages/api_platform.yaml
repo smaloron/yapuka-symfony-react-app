@@ -1,0 +1,30 @@
+# =============================================================================
+# Configuration API Platform
+# =============================================================================
+# API Platform expose automatiquement les entités annotées en tant qu'API REST.
+# Documentation Swagger disponible sur /api/docs
+# =============================================================================
+
+api_platform:
+    # Titre affiché dans la documentation Swagger
+    title: 'Yapuka API'
+    description: 'API de gestion de tâches - Projet DevOps'
+    version: '1.0.0'
+
+    # Formats supportés par l'API
+    formats:
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+
+    # Préfixe de toutes les routes API Platform
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Accept']
+
+    # Documentation Swagger/OpenAPI
+    swagger:
+        versions: [3]
+
+    # Activer la documentation
+    enable_docs: true

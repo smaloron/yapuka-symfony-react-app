@@ -1,0 +1,17 @@
+# =============================================================================
+# Yapuka - Fichier .gitignore racine
+# =============================================================================
+
+# Fichiers d'environnement
+.env.local
+.env.*.local
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

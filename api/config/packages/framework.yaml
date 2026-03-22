@@ -1,0 +1,30 @@
+# =============================================================================
+# Configuration du framework Symfony
+# =============================================================================
+# Paramètres généraux du framework : secret, sessions, router, etc.
+# =============================================================================
+
+framework:
+    secret: '%env(APP_SECRET)%'
+
+    # Configuration du routeur
+    router:
+        utf8: true
+
+    # Validation activée (utilisée par API Platform et les entités)
+    validation:
+        enabled: true
+
+    # Sérialiseur activé (utilisé par API Platform pour JSON)
+    serializer:
+        enabled: true
+
+    # Génération d'UID Symfony
+    uid:
+        default_uuid_version: 7
+
+    test: true
+
+when@test:
+  framework:
+    test: true

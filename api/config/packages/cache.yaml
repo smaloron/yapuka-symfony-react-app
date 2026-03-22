@@ -1,0 +1,13 @@
+# =============================================================================
+# Configuration du cache Symfony avec Redis
+# =============================================================================
+# Redis est utilisé comme backend de cache pour améliorer les performances.
+# Le cache "app" est utilisé pour stocker les résultats fréquents (ex: stats).
+# =============================================================================
+
+framework:
+    cache:
+        # Pool de cache par défaut : Redis
+        app: cache.adapter.redis
+        # URL de connexion Redis (définie dans .env)
+        default_redis_provider: '%env(REDIS_URL)%'
